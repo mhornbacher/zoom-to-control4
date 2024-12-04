@@ -18,7 +18,7 @@ There are two ways to run the application, either via the native binary or via d
 
 [See the docker container in the container registry](https://github.com/mhornbacher/zoom-to-control4/pkgs/container/zoom-to-control4)
 
-> [!Information]
+> [!NOTE]
 > Remember to set the PORT and TARGET variables
 
 ## ⚙️ Configuration
