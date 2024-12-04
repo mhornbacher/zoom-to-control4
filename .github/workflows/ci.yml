@@ -30,3 +30,6 @@ jobs:
           files: |
             LICENSE
             README.md
+
+  deploy:
+    uses: mhornbacher/zoom-to-control4/.github/deploy.yml@main
