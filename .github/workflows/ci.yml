@@ -1,3 +1,5 @@
+name: "CI"
+
 on:
   push:
     branches:
@@ -20,3 +22,11 @@ jobs:
         with:
           fetch-depth: 0
       - uses: valitydev/action-autotag@v1
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: |
+            LICENSE
+            README.md
