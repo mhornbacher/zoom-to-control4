@@ -32,4 +32,5 @@ jobs:
             README.md
 
   deploy:
+    needs: tag
     uses: mhornbacher/zoom-to-control4/.github/deploy.yml@main
