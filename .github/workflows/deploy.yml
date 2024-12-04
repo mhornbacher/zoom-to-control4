@@ -26,5 +26,4 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           binary_name: "zoom-to-control4"
-          extra_files: LICENSE README.md
           release_tag: latest
