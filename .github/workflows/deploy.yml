@@ -2,6 +2,10 @@ name: "Deploy"
 
 on:
   workflow_call: # called from CI
+    inputs:
+      release-tag:
+          required: true
+          type: string
 
 permissions:
   contents: write
@@ -32,7 +36,7 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           binary_name: "zoom-to-control4"
-          release_tag: latest
+          release_tag: ${{ inputs.release-tag }}
 
   docker:
     name: Release docker
