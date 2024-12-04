@@ -2,8 +2,6 @@ name: "Deploy"
 
 on:
   workflow_call: # called from CI
-  release:
-    types: [created]
 
 permissions:
   contents: write
@@ -31,3 +29,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           binary_name: "zoom-to-control4"
           extra_files: LICENSE README.md
+          release_tag: latest
