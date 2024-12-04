@@ -24,7 +24,7 @@ func (client *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 func Test_NewServer(t *testing.T) {
 	client := new(MockClient)
-	server := NewServer("9001", 1*time.Second, "localhost:9002", client)
+	server := NewServer("9001", "localhost:9002", client)
 	go func() {
 		server.Start()
 	}()
@@ -38,12 +38,18 @@ func Test_NewServer(t *testing.T) {
 	}
 
 	conn.Write([]byte("ConfrenceDualMode"))
-	conn.Close() // close the connection
+	time.Sleep(750 * time.Millisecond)        // allow the server time to work
+	conn.Write([]byte("ConfrenceSingleMode")) // send more data
+	time.Sleep(750 * time.Millisecond)        // allow the server time to work
 
-	time.Sleep(1 * time.Second) // allow the server time to work
+	conn.Close()
 
-	if len(client.Requests) != 1 {
+	if len(client.Requests) == 0 {
 		t.Fatal("server did not make http request")
+	}
+
+	if len(client.Requests) != 2 {
+		t.Fatal("server did not make both http requests")
 	}
 
 	if client.Requests[0].URL.Host != "localhost:9002" {

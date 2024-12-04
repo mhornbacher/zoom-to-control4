@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"log/slog"
 	"net"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type Client interface {
@@ -17,24 +15,21 @@ type Client interface {
 
 // Represents the TCP server that forwards requests
 type Server struct {
-	port    string
-	timeout time.Duration
-	target  string
-	client  Client
+	port   string
+	target string
+	client Client
 }
 
 // Returns a new Server
 func NewServer(
 	port string,
-	timeout time.Duration,
 	target string,
 	client Client,
 ) *Server {
 	return &Server{
-		port:    port,
-		timeout: timeout,
-		target:  target,
-		client:  client,
+		port:   port,
+		target: target,
+		client: client,
 	}
 }
 
@@ -61,7 +56,6 @@ func (server *Server) Start() {
 
 func (server *Server) handleConnection(conn net.Conn) {
 	defer conn.Close() // always close the connection
-	conn.SetReadDeadline(time.Now().Add(server.timeout))
 
 	// create a logger with the IP for tracing concurrent requests
 	defaultLogInfo := []slog.Attr{
@@ -69,21 +63,38 @@ func (server *Server) handleConnection(conn net.Conn) {
 	}
 	log := slog.New(slog.Default().Handler().WithAttrs(defaultLogInfo))
 
-	log.Info("received request")
+	log.Info("received connection")
 
-	message, err := bufio.NewReader(conn).ReadString('\n')
-	if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-		log.Error("connection timed out")
-		return
-	} else if err == io.EOF {
-		log.Info("finised reading data", "message", message)
-	} else if err != nil {
-		log.Error("error reading data", "error", err)
-		return
+	buffer := make([]byte, 4096) // we don't expect any messages to be above 4kb
+
+	for {
+		n, err := conn.Read(buffer)
+		// break the loop if the connection is closed
+		if err != nil && err != io.EOF {
+			log.Error("connection error, closing connection", "error", err)
+			break
+		} else if err == io.EOF {
+			message := string(buffer[:n])
+			log.Warn("EOF encountered, closing connection", "message", message)
+
+			// if we got a message before it closed, honor the request
+			if len(message) > 0 {
+				go server.sendRequest(log, message)
+			}
+			break
+			// only send data if we have any
+		} else if n > 0 {
+			message := string(buffer[:n])
+			go server.sendRequest(log, message)
+		}
 	}
 
-	url := fmt.Sprintf("http://%s/%s",
-		server.target, strings.TrimSpace(string(message)))
+	log.Info("closed connection")
+}
+
+// sends a request to the target with the message in the URL
+func (server *Server) sendRequest(log *slog.Logger, message string) {
+	url := fmt.Sprintf("http://%s/%s", server.target, strings.TrimSpace(message))
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		slog.Error("unable to create request", "error", err)
@@ -103,7 +114,7 @@ func (server *Server) handleConnection(conn net.Conn) {
 		log.Error("unable to read body", "error", err)
 	}
 
-	log.Info("response",
+	log.Info("received response",
 		slog.Int("status code", response.StatusCode),
 		slog.String("body", string(body)))
 }
