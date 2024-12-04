@@ -14,7 +14,12 @@ There are two ways to run the application, either via the native binary or via d
     PORT=$PORT TARGET=$TARGET ./zoom-to-control-4-latest-$PLATFORM-$ARCH
     ```
 
-<!-- ### 🐳 Docker -->
+### 🐳 Docker
+
+[See the docker container in the container registry](https://github.com/mhornbacher/zoom-to-control4/pkgs/container/zoom-to-control4)
+
+> [!Information]
+> Remember to set the PORT and TARGET variables
 
 ## ⚙️ Configuration
 
@@ -24,3 +29,7 @@ There are two ways to run the application, either via the native binary or via d
 | TARGET | the ip/port for the messages to be sent to | 192.168.17.214:12345 |
 
 
+## 📚 References/Documentation
+
+- [Zoom tool](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064072)
+- [Control 4 Driver](https://chowmain.software/drivers/control4-generic-tcp-command#documents)
