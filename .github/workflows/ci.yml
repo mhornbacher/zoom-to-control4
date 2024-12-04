@@ -21,10 +21,3 @@ jobs:
         with:
           fetch-depth: 0
       - uses: valitydev/action-autotag@v1
-  
-  release:
-    needs: [ tag ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Release
-        uses: softprops/action-gh-release@v2
