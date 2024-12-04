@@ -33,4 +33,4 @@ jobs:
 
   deploy:
     needs: tag
-    uses: mhornbacher/zoom-to-control4/.github/deploy.yml@main
+    uses: mhornbacher/zoom-to-control4/.github/workflows/deploy.yml@main
