@@ -35,7 +35,7 @@ func NewServer(
 
 // Starts the server
 func (server *Server) Start() {
-	listener, err := net.Listen("tcp4", ":"+server.port)
+	listener, err := net.Listen("tcp", ":"+server.port)
 	if err != nil {
 		slog.Error("unable to start server", slog.Any("error", err))
 		return
